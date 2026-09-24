@@ -1,0 +1,72 @@
+Crée une application web mobile-first nommée « Synapse », plateforme de révision pour les étudiants de la Faculté des Sciences de l’Université de Douala.
+=== CONTEXTE ===
+Filières au lancement :
+- Biologie des organismes animaux
+- Biologie des organismes végétaux
+- Biochimie
+Niveaux : 1 et 2
+Organisation du contenu : Filière → Niveau → Semestre (il y a 2 semestres)
+=== RÔLES ===
+1. Étudiant
+2. Admin (gestion du contenu et des abonnements)
+=== PARCOURS ÉTUDIANT ===
+1. Inscription / Connexion
+2. Choix obligatoire : Filière → Niveau (1 ou 2) → Semestre
+3. Page d’accueil spécifique selon le niveau (Niveau 1 ou Niveau 2)
+4. Accès aux modules du semestre :
+   - Cours (contenu textuel)
+   - Résumé
+   - Exercices d’entraînement
+   - QCM
+   - Anciennes épreuves (si disponibles)
+5. Suivi de progression visible (barre de progression, scores, modules terminés)
+6. Logique QCM :
+   - L’étudiant répond aux questions
+   - Score calculé automatiquement
+   - Si échec ou 1 à 3 mauvaises réponses sur une question → afficher le corrigé + les explications détaillées
+   - Bouton « Recommencer » disponible
+7. Bouton IA discret (dernier recours uniquement) : l’étudiant peut poser une question pour approfondir, seulement après avoir consulté le cours, le résumé et les corrigés. L’IA ne doit PAS être le centre de l’app.
+=== CÔTÉ ADMIN ===
+- Gérer Filières, Niveaux, Semestres
+- Ajouter / modifier / supprimer : Cours, Résumés, Exercices, QCM (question, options, bonne réponse, explication), Anciennes épreuves
+- Voir la liste des étudiants, leur progression et le statut de leur abonnement
+- Gérer les abonnements (actif / expiré)
+=== ABONNEMENT & PAIEMENT ===
+Deux formules :
+- Mensuel : 2 000 FCFA
+- Semestriel : 10 000 FCFA
+Paiement via Orange Money et MTN MoMo (prévoir intégration type CinetPay ou Campay).
+Après paiement réussi → activer automatiquement l’accès aux contenus du semestre choisi.
+Seuls les étudiants avec un abonnement actif peuvent accéder aux cours.
+=== BASE DE DONNÉES (Data Types) ===
+User (rôle, filière, niveau, semestre, statut abonnement, date expiration)
+Filière
+Niveau
+Semestre
+Cours (lié à Filière + Niveau + Semestre)
+Question (QCM ou Exercice, options, bonne réponse, explication)
+Réponse_Étudiant
+Progression
+Abonnement
+=== DESIGN ===
+- Interface propre, moderne, universitaire (bleu foncé #1A365D, blanc, accents verts)
+- Mobile-friendly (priorité smartphone)
+- Navigation claire et simple
+- Bouton IA discret (pas au centre de l’écran)
+- Langue de l’interface : Français
+=== PAGES À GÉNÉRER ===
+- Accueil / Landing
+- Connexion & Inscription
+- Choix Filière → Niveau → Semestre
+- Tableau de bord Niveau 1
+- Tableau de bord Niveau 2
+- Liste des cours du semestre
+- Page Cours + Résumé
+- Page Exercices
+- Page QCM (avec feedback + corrigé)
+- Anciennes épreuves
+- Progression
+- Abonnement / Paiement
+- Profil
+- Zone Admin (gestion contenus + étudiants + abonnements)
+Génère l’application complète avec les pages, la structure de données, les workflows principaux (inscription, choix parcours, QCM avec feedback, activation abonnement) et les règles d’accès (contenu réservé aux abonnés actifs).

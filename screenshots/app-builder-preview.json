@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Synapse",
+      "hasCanvas": false,
+      "bodyTextLen": 349,
+      "bodyTextHash": "b12efc19c51135ba1cc320003960b0f0103c445470f0bd538cb2a5d1d3e97538",
+      "bodyTextPrefix": "Synapse FS · UDLA FACULTÉ DES SCIENCES Réviser autrement. Cours,",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Synapse",
+      "hasCanvas": false,
+      "bodyTextLen": 349,
+      "bodyTextHash": "b12efc19c51135ba1cc320003960b0f0103c445470f0bd538cb2a5d1d3e97538",
+      "bodyTextPrefix": "Synapse FS · UDLA FACULTÉ DES SCIENCES Réviser autrement. Cours,",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}

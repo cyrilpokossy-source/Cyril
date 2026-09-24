@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", "Iowan Old Style", "Palatino Linotype", serif;
+
+  --color-ink: #1a365d;
+  --color-ink-deep: #10243f;
+  --color-ink-soft: #2c4d78;
+  --color-paper: #f3efe4;
+  --color-paper-2: #e8e1d2;
+  --color-cream: #faf7f0;
+  --color-fg: #14202e;
+  --color-muted: #5b6b7c;
+  --color-faint: #8b97a6;
+  --color-signal: #2a6b4f;
+  --color-signal-fg: #f4f0e6;
+  --color-signal-soft: #d4e5db;
+  --color-danger: #8c3737;
+  --color-warn: #8a5a28;
+  --color-line: #d9d2c3;
+  --color-orange-money: #f16e00;
+  --color-mtn: #ffcc00;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.125rem;
+  --radius-xl: 1.75rem;
+  --radius-2xl: 2rem;
+
+  --shadow-paper: 0 0 0 1px rgb(20 32 46 / 0.06), 0 1px 2px rgb(20 32 46 / 0.04),
+    0 8px 24px rgb(20 32 46 / 0.05);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: var(--color-paper);
+    color: var(--color-fg);
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--color-paper);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+    font-family: var(--font-display);
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-signal) 28%, white);
+    color: var(--color-ink-deep);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.prose-note {
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: var(--color-fg);
+}
+.prose-note h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 1.6rem 0 0.5rem;
+  color: var(--color-ink);
+}
+.prose-note p + p {
+  margin-top: 0.9rem;
+}
+.prose-note ul {
+  margin: 0.7rem 0;
+  padding-left: 1.15rem;
+}
+.prose-note li {
+  margin: 0.3rem 0;
+  line-height: 1.55;
+}
+.prose-note strong {
+  font-weight: 600;
+  color: var(--color-ink);
+}
