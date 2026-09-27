@@ -26,3 +26,24 @@ export function initials(name: string | null | undefined) {
   const parts = name.trim().split(/\s+/).slice(0, 2);
   return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "S";
 }
+
+export function planLabel(plan: string | null | undefined) {
+  if (plan === "monthly") return "Mensuel";
+  if (plan === "semester") return "Semestriel";
+  return "—";
+}
+
+export function providerLabel(provider: string | null | undefined) {
+  if (provider === "orange_money") return "Orange Money";
+  if (provider === "mtn_momo") return "MTN MoMo";
+  if (provider === "admin") return "Offert";
+  return provider || "—";
+}
+
+export function subStatusLabel(status: string | null | undefined) {
+  if (status === "active") return "Actif";
+  if (status === "expired") return "Expiré";
+  if (status === "pending") return "En attente";
+  if (status === "failed") return "Échoué";
+  return "Sans abonnement";
+}

@@ -115,6 +115,35 @@ export type QcmSubmitResult = {
   attempt: number;
 };
 
+export type AdminPayment = {
+  id: number;
+  displayName: string | null;
+  email: string | null;
+  plan: string;
+  amountFcfa: number;
+  provider: string;
+  status: string;
+  createdAt: string;
+  expiresAt: string | null;
+};
+
+export type AdminFinance = {
+  students: number;
+  admins: number;
+  active: number;
+  expired: number;
+  none: number;
+  collected: number;
+  monthlyCount: number;
+  monthlySum: number;
+  semesterCount: number;
+  semesterSum: number;
+  orange: number;
+  mtn: number;
+  adminGift: number;
+  payments: AdminPayment[];
+};
+
 export const PLANS: { id: Plan; label: string; price: number; days: number; hint: string }[] = [
   { id: "monthly", label: "Mensuel", price: 2000, days: 30, hint: "Accès 30 jours au semestre choisi" },
   { id: "semester", label: "Semestriel", price: 10000, days: 180, hint: "Accès 6 mois — le plus choisi" },

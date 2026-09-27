@@ -85,7 +85,11 @@ function ProfilBody() {
         </Button>
       </div>
 
-      {profile?.role !== "admin" ? (
+      {profile?.role === "admin" ? (
+        <Link to="/admin" className="mt-8 block text-sm text-signal">
+          Ouvrir l’administration →
+        </Link>
+      ) : me.data?.canClaimAdmin ? (
         <div className="mt-10 rounded-[1.4rem] border border-line px-4 py-4">
           <p className="text-sm text-muted">
             Premier administrateur du catalogue ? Activez l’espace de gestion (une seule fois).
@@ -95,11 +99,7 @@ function ProfilBody() {
             Activer l’espace admin
           </Button>
         </div>
-      ) : (
-        <Link to="/admin" className="mt-8 block text-sm text-signal">
-          Ouvrir l’administration →
-        </Link>
-      )}
+      ) : null}
 
       <div className="mt-10 border-t border-line pt-6">
         <p className="mb-3 text-[0.68rem] uppercase tracking-[0.14em] text-muted">Session</p>

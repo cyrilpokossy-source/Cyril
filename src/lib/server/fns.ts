@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { authMiddleware } from "@/lib/auth/middleware";
 import { getSql } from "@/lib/db";
-import { PLANS, type Course, type CourseProgress, type CourseSummary, type Exercise, type PastExam, type QcmQuestion, type QcmSubmitResult } from "@/lib/types";
+import { PLANS, type Course, type CourseProgress, type CourseSummary, type Exercise, type PastExam, type QcmQuestion, type QcmSubmitResult, type AdminFinance } from "@/lib/types";
 import { ensureCatalogSeeded } from "./seed";
 import {
   getActiveSubscription,
@@ -21,7 +21,14 @@ export const getMe = createServerFn({ method: "GET" })
       email: session?.email ?? null,
     });
     const subscription = await getActiveSubscription(context.userId);
-    return { profile, subscription };
+    const sql = await getSql();
+    const admins = await sql<{ c: number }>`select count(*)::int as c from profiles where role = 'admin'`;
+    const adminExists = (admins[0]?.c ?? 0) > 0;
+    return {
+      profile,
+      subscription,
+      canClaimAdmin: profile.role !== "admin" && !adminExists,
+    };
   });
 
 export const listFilieres = createServerFn({ method: "GET" })
@@ -571,12 +578,16 @@ export const listAdminStudents = createServerFn({ method: "GET" })
       filiere_name: string | null;
       sub_status: string | null;
       sub_expires: string | null;
+      sub_plan: string | null;
+      sub_amount: number | null;
+      sub_provider: string | null;
       completed: number;
       modules: number;
     }>`
       select p.user_id, p.display_name, p.email, p.role, p.niveau, p.semestre,
              f.name as filiere_name,
              s.status as sub_status, s.expires_at::text as sub_expires,
+             s.plan as sub_plan, s.amount_fcfa as sub_amount, s.provider as sub_provider,
              coalesce((
                select count(*)::int from progress pr
                where pr.user_id = p.user_id and pr.completed = true
@@ -588,7 +599,7 @@ export const listAdminStudents = createServerFn({ method: "GET" })
       from profiles p
       left join filieres f on f.id = p.filiere_id
       left join lateral (
-        select status, expires_at from subscriptions
+        select status, expires_at, plan, amount_fcfa, provider from subscriptions
         where user_id = p.user_id
         order by case when status = 'active' then 0 else 1 end, created_at desc
         limit 1
@@ -605,9 +616,114 @@ export const listAdminStudents = createServerFn({ method: "GET" })
       filiereName: r.filiere_name,
       subStatus: r.sub_status,
       subExpires: r.sub_expires,
+      subPlan: r.sub_plan,
+      subAmount: r.sub_amount,
+      subProvider: r.sub_provider,
       completed: r.completed,
       modules: r.modules,
     }));
+  });
+
+export const getAdminFinance = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .handler(async ({ context }): Promise<AdminFinance> => {
+    await requireAdmin(context.userId);
+    const sql = await getSql();
+    await sql`
+      update subscriptions
+      set status = 'expired'
+      where status = 'active' and expires_at is not null and expires_at < now()
+    `;
+
+    const people = await sql<{ students: number; admins: number }>`
+      select
+        count(*) filter (where role = 'student')::int as students,
+        count(*) filter (where role = 'admin')::int as admins
+      from profiles
+    `;
+
+    const subCounts = await sql<{ active: number; expired: number; none: number }>`
+      select
+        count(*) filter (where s.status = 'active')::int as active,
+        count(*) filter (where s.status is not null and s.status <> 'active')::int as expired,
+        count(*) filter (where s.status is null)::int as none
+      from profiles p
+      left join lateral (
+        select status from subscriptions
+        where user_id = p.user_id
+        order by case when status = 'active' then 0 else 1 end, created_at desc
+        limit 1
+      ) s on true
+      where p.role = 'student'
+    `;
+
+    const money = await sql<{
+      collected: number;
+      monthly_count: number;
+      monthly_sum: number;
+      semester_count: number;
+      semester_sum: number;
+      orange: number;
+      mtn: number;
+      admin_gift: number;
+    }>`
+      select
+        coalesce(sum(amount_fcfa) filter (where status in ('active', 'expired') and provider <> 'admin'), 0)::int as collected,
+        count(*) filter (where plan = 'monthly' and status in ('active', 'expired') and provider <> 'admin')::int as monthly_count,
+        coalesce(sum(amount_fcfa) filter (where plan = 'monthly' and status in ('active', 'expired') and provider <> 'admin'), 0)::int as monthly_sum,
+        count(*) filter (where plan = 'semester' and status in ('active', 'expired') and provider <> 'admin')::int as semester_count,
+        coalesce(sum(amount_fcfa) filter (where plan = 'semester' and status in ('active', 'expired') and provider <> 'admin'), 0)::int as semester_sum,
+        coalesce(sum(amount_fcfa) filter (where provider = 'orange_money' and status in ('active', 'expired')), 0)::int as orange,
+        coalesce(sum(amount_fcfa) filter (where provider = 'mtn_momo' and status in ('active', 'expired')), 0)::int as mtn,
+        coalesce(sum(amount_fcfa) filter (where provider = 'admin' and status in ('active', 'expired')), 0)::int as admin_gift
+      from subscriptions
+    `;
+
+    const payments = await sql<{
+      id: number;
+      display_name: string | null;
+      email: string | null;
+      plan: string;
+      amount_fcfa: number;
+      provider: string;
+      status: string;
+      created_at: string;
+      expires_at: string | null;
+    }>`
+      select s.id, p.display_name, p.email, s.plan, s.amount_fcfa, s.provider, s.status,
+             s.created_at::text, s.expires_at::text
+      from subscriptions s
+      join profiles p on p.user_id = s.user_id
+      order by s.created_at desc
+      limit 40
+    `;
+
+    return {
+      students: people[0]?.students ?? 0,
+      admins: people[0]?.admins ?? 0,
+      active: subCounts[0]?.active ?? 0,
+      expired: subCounts[0]?.expired ?? 0,
+      none: subCounts[0]?.none ?? 0,
+      collected: money[0]?.collected ?? 0,
+      monthlyCount: money[0]?.monthly_count ?? 0,
+      monthlySum: money[0]?.monthly_sum ?? 0,
+      semesterCount: money[0]?.semester_count ?? 0,
+      semesterSum: money[0]?.semester_sum ?? 0,
+      orange: money[0]?.orange ?? 0,
+      mtn: money[0]?.mtn ?? 0,
+      adminGift: money[0]?.admin_gift ?? 0,
+      payments: payments.map((p) => ({
+        id: p.id,
+        displayName: p.display_name,
+        email: p.email,
+        plan: p.plan,
+        amountFcfa: p.amount_fcfa,
+        provider: p.provider,
+        status: p.status,
+        createdAt: p.created_at,
+        expiresAt: p.expires_at,
+      })),
+    };
   });
 
 export const setSubscriptionStatus = createServerFn({ method: "POST" })

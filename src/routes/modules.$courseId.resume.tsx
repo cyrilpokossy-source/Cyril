@@ -30,9 +30,9 @@ function ResumePage() {
   if (!data) return null;
   if (data.locked) return <Paywall />;
   return (
-    <article className="rounded-[1.6rem] bg-ink px-5 py-6 text-cream">
-      <p className="text-[0.68rem] uppercase tracking-[0.16em] text-signal-soft">À retenir</p>
-      <div className="mt-3 [&_.prose-note]:text-cream [&_h3]:text-cream [&_strong]:text-cream">
+    <article className="rounded-[1.6rem] border-l-[6px] border-signal bg-cream px-5 py-6 shadow-paper">
+      <p className="text-[0.68rem] uppercase tracking-[0.16em] text-signal">À retenir</p>
+      <div className="mt-3">
         <NoteBody text={data.course.resume} />
       </div>
     </article>
